@@ -21,6 +21,7 @@ public class BossPattern : MonoBehaviour
     public GameObject spinHitBox;
     public GameObject rushHitBox;
 
+    public float patternWaitTime = 0.5f;
     public float detectionRange;
     public float attackRange;
     public float rushMinDistance;
@@ -145,7 +146,7 @@ public class BossPattern : MonoBehaviour
         stingHitBox.SetActive(true);
         yield return new WaitForSeconds(0.2f);
         stingHitBox.SetActive(false);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(patternWaitTime);
     }
 
     IEnumerator Slash()
@@ -156,7 +157,7 @@ public class BossPattern : MonoBehaviour
         slashHitBox.SetActive(true);
         yield return new WaitForSeconds(0.25f);
         slashHitBox.SetActive(false);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(patternWaitTime);
     }
 
     IEnumerator Kung()
@@ -169,7 +170,7 @@ public class BossPattern : MonoBehaviour
         ShakeCamera.Instance.Shaking(5, 1, 0.5f);
         yield return new WaitForSeconds(0.4f);
         kungHitBox.SetActive(false);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(patternWaitTime);
     }
 
     IEnumerator Spin()
@@ -181,7 +182,7 @@ public class BossPattern : MonoBehaviour
         AudioManager.instance.PlaySfx(Sfx.Slash);
         yield return new WaitForSeconds(1f);
         spinHitBox.SetActive(false);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(patternWaitTime);
     }
     IEnumerator LongSpin()
     {
@@ -193,18 +194,19 @@ public class BossPattern : MonoBehaviour
         while (timer < duration)
         {
             // 플레이어를 지속적으로 따라감
+            
             Vector2 dir = (playerTransform.position - transform.position).normalized;
             rb.velocity = new Vector2(dir.x * moveSpeed, rb.velocity.y);
             AudioManager.instance.PlaySfx(Sfx.Slash);
             timer += Time.deltaTime;
             yield return null;
         }
-
+        
         // 정지 + 초기화
         rb.velocity = Vector2.zero;
         spinHitBox.SetActive(false);
         animator.SetBool("long", false);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(patternWaitTime);
     }
 
     public void SetHp(float damage)

@@ -1,11 +1,21 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
+public enum weapon_type
+{
+    shotgun,
+    rebolber
+}
+
 public class Move : MonoBehaviour
 {
+
+    public GameObject rebolberBullet;
+    public weapon_type weapon;
     public LayerMask groundLayer;
     public Transform groundCheck;
     public Vector2 groundCheckSize = new Vector2(0.5f, 0.1f);
@@ -28,6 +38,9 @@ public class Move : MonoBehaviour
     public float speed;                                         //이동 속도
     public float angle;                                         //발사 각도(쓸일 생김)
     public GameObject target;                                   //날라갈 때 사용할 오브젝트(shotgun)의 방향
+    public GameObject rebolber1;
+    public GameObject rebolber2;
+
     public GameObject jumpdir;                                  //실제로 날아갈 방향
     Vector2 mouse;                                              //마우스 방향
     Rigidbody2D rigid;                                          //rigidbody2D
@@ -35,6 +48,9 @@ public class Move : MonoBehaviour
     public bool isGround;                                       //땅에 닿았는가 판정
     public float maxSpeedx;
     public float maxSpeedy;
+
+    public GameObject anchor1;
+    public GameObject anchor2;
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -43,13 +59,26 @@ public class Move : MonoBehaviour
     }
     private void Start()
     {
-        Time.timeScale = 1;
         Physics2D.IgnoreLayerCollision(7, 8, false);
         Physics2D.IgnoreLayerCollision(7, 9, false);
     }
     private void Update()
     {
-   
+        if(weapon == weapon_type.shotgun)
+        {
+            target.SetActive(true);
+            rebolber1.SetActive(false);
+            rebolber2.SetActive(false);
+        }
+        else if(weapon == weapon_type.rebolber)
+        {
+            target.SetActive(false);
+            rebolber1.SetActive(true);
+            rebolber2.SetActive(true);
+        }
+        
+
+          
         if (!isDie)
         {
             currentspeed = rigid.velocity.magnitude;
@@ -147,11 +176,11 @@ public class Move : MonoBehaviour
         }
     }
 
-    public void SetHp(int damage)
+    public void SetHp(float damage)
     {
         if (!isHit)
         {
-            currentHp -= damage;
+            currentHp -= (int)damage;
             StartCoroutine(Invisible());
             
             if (currentHp <= 0 && !isDie)
@@ -215,7 +244,7 @@ public class Move : MonoBehaviour
     public void PlayerMove()
     {
         MoveX = Input.GetAxis("Horizontal");
-        rigid.AddForce(new Vector2(MoveX * speed,0),ForceMode2D.Force);
+        rigid.AddForce(new Vector2(MoveX * speed, 0), ForceMode2D.Force);
         if (Input.GetAxis("Horizontal") != 0)
         {
             isWalk = true;
@@ -225,34 +254,42 @@ public class Move : MonoBehaviour
             isWalk = false;
         }
 
-        if(Input.GetAxis("Horizontal")>0)
+        if (Input.GetAxis("Horizontal") > 0)
         {
-            this.gameObject.GetComponent<SpriteRenderer>().flipX  = false;
+            this.gameObject.GetComponent<SpriteRenderer>().flipX = false;
         }
-        else if(Input.GetAxis("Horizontal") < 0)
+        else if (Input.GetAxis("Horizontal") < 0)
         {
-            this.gameObject.GetComponent <SpriteRenderer>().flipX = true;
+            this.gameObject.GetComponent<SpriteRenderer>().flipX = true;
         }
-        if (rigid.velocity.x >= maxSpeedx) 
+        if (rigid.velocity.x >= maxSpeedx)
         {
-            rigid.velocity = new Vector2(maxSpeedx, rigid.velocity.y); 
+            rigid.velocity = new Vector2(maxSpeedx, rigid.velocity.y);
         }
-        else if  (rigid.velocity.x <= -maxSpeedx)
+        else if (rigid.velocity.x <= -maxSpeedx)
         {
-            rigid.velocity = new Vector2(-maxSpeedx, rigid.velocity.y); 
+            rigid.velocity = new Vector2(-maxSpeedx, rigid.velocity.y);
         }
         if (rigid.velocity.y >= maxSpeedy)
         {
-            rigid.velocity = new Vector2(rigid.velocity.x,maxSpeedy);
+            rigid.velocity = new Vector2(rigid.velocity.x, maxSpeedy);
         }
 
         float moveX = Input.GetAxis("Horizontal");
         mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         angle = Mathf.Atan2(mouse.y - target.transform.position.y, mouse.x - target.transform.position.x) * Mathf.Rad2Deg;
-        target.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        if(weapon == weapon_type.shotgun)
+        {
+            target.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        }
+        else if(weapon == weapon_type.rebolber)
+        {
+            rebolber1.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            rebolber2.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        }
     }
 
-
+    
 
     IEnumerator Shootgun()
     {
@@ -263,27 +300,67 @@ public class Move : MonoBehaviour
 
         jumpdir.transform.rotation = Quaternion.AngleAxis(angle - 90, Vector3.forward);
 
-        maxSpeedx = 20;
-        GameObject shootObj = Instantiate(bullet, target.transform.position, target.transform.rotation);
-        moveDirection = -jumpdir.transform.up * GunPower;
-        target.GetComponent<Animator>().SetTrigger("isAttack");
-        Debug.Log("dd");
-        rigid.velocity = new Vector2(rigid.velocity.x, rigid.velocity.y) + moveDirection;
-        yield return new WaitForSeconds(0.1f);
-        if (!isGround)
+        if(weapon == weapon_type.shotgun)
         {
-            currentBullet -= 1;
+            maxSpeedx = 22;
+            GameObject shootObj = Instantiate(bullet, target.transform.position, target.transform.rotation);
+            moveDirection = -jumpdir.transform.up * GunPower;
+            target.GetComponent<Animator>().SetTrigger("isAttack");
+            Debug.Log("dd");
+            rigid.velocity = new Vector2(rigid.velocity.x, rigid.velocity.y) + moveDirection;
+            yield return new WaitForSeconds(0.1f);
+            if (!isGround)
+            {
+                currentBullet -= 1;
 
-        }
-        AudioManager.instance.PlaySfx(AudioManager.instance.sfx = Sfx.Playershot);
-        yield return new WaitForSeconds(0.05f);
-        for (float i = maxSpeedx; i > 10; i--)
-        {
-            maxSpeedx -= 0.5f;
-            i = maxSpeedx;
+            }
+            AudioManager.instance.PlaySfx(AudioManager.instance.sfx = Sfx.Playershot);
             yield return new WaitForSeconds(0.05f);
+            for (float i = maxSpeedx; i > 10; i--)
+            {
+                maxSpeedx -= 0.5f;
+                i = maxSpeedx;
+                yield return new WaitForSeconds(0.05f);
+            }
+            maxSpeedx = 10;
         }
-        maxSpeedx = 10;
+        else if(weapon == weapon_type.rebolber)
+        {
+            maxSpeedx = 11;
+            moveDirection = -jumpdir.transform.up * GunPower/5.9f;
+            
+           
+            //target.GetComponent<Animator>().SetTrigger("isAttack");
+            Debug.Log("dd");
+            rigid.velocity = new Vector2(rigid.velocity.x, rigid.velocity.y) + moveDirection;
+            yield return new WaitForSeconds(0.1f);
+            if (!isGround)
+            {
+                currentBullet -= 1;
+
+            }
+            GameObject shootObj = Instantiate(rebolberBullet, anchor1.transform.position, rebolber1.transform.rotation);
+            AudioManager.instance.PlaySfx(AudioManager.instance.sfx = Sfx.Playershot);
+
+            yield return new WaitForSeconds(0.1f);
+
+            //target.GetComponent<Animator>().SetTrigger("isAttack");
+            Debug.Log("dd");
+            rigid.velocity = new Vector2(rigid.velocity.x, rigid.velocity.y) + moveDirection;
+            GameObject shootObj1 = Instantiate(rebolberBullet, anchor2.transform.position, rebolber2.transform.rotation);
+            AudioManager.instance.PlaySfx(AudioManager.instance.sfx = Sfx.Playershot);
+
+            
+            
+            yield return new WaitForSeconds(0.05f);
+            for (float i = maxSpeedx; i > 10; i--)
+            {
+                maxSpeedx -= 0.5f;
+                i = maxSpeedx;
+                yield return new WaitForSeconds(0.05f);
+            }
+            maxSpeedx = 10;
+        }
         
        if(currentBullet < 0)
         {

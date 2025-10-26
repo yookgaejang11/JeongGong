@@ -11,19 +11,20 @@ public enum TargetType
 
 public class Bullet : MonoBehaviour
 {
-    Vector2 dir;
     public bool isAttack = true;
-    public int damage = 1;
+    public float damage = 1;
     public TargetType targetType;
     public float shootTiming;
     Rigidbody2D rigid;
     public GameObject target;
     Vector2 newPos;
     public float speed;
+
+    
     // Start is called before the first frame update
     void Awake()
     {
-        dir = GameObject.Find("Player").GetComponent<Move>().target.transform.right;
+        
         rigid = GetComponent<Rigidbody2D>();
         
         try
@@ -66,7 +67,7 @@ public class Bullet : MonoBehaviour
             }
             else if (targetType == TargetType.Enemy)
             {
-                rigid.velocity = dir * speed;
+                rigid.velocity = transform.right * speed;
             }
         
         yield return new WaitForSeconds(shootTiming);
@@ -97,7 +98,7 @@ public class Bullet : MonoBehaviour
                 else if (targetType == TargetType.Enemy && collision.gameObject.GetComponent<BossPattern>())
                 {
                     isAttack = false;
-                    collision.gameObject.gameObject.GetComponent<BossPattern>().SetHp(2);
+                    collision.gameObject.gameObject.GetComponent<BossPattern>().SetHp(damage);
                 }
 
 
@@ -108,14 +109,12 @@ public class Bullet : MonoBehaviour
             Destroy(this.gameObject);
         }
 
-        
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
         if (collision.gameObject.CompareTag("Ground"))
         {
             Destroy(this.gameObject);
         }
+
+
     }
+
 }

@@ -9,7 +9,7 @@ public class enemy_Skeleton : MonoBehaviour
     public bool isDie = false;
     Animator animator;
     public int maxHp;
-    public int currentHp;
+    public float currentHp;
     bool isShoot = true;
     public GameObject bullet;
     public Vector3 pos;
@@ -32,7 +32,7 @@ public class enemy_Skeleton : MonoBehaviour
     {
     }
 
-    public void SetHp(int damage)
+    public void SetHp(float damage)
     {
         if (animator.GetBool("isSpawn"))
         {

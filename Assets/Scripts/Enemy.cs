@@ -6,8 +6,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public int maxHp;
-    public int currentHp;
+    public float maxHp;
+    public float currentHp;
     bool isShoot =true;
     public GameObject bullet;
     public Vector3 pos;
@@ -28,7 +28,7 @@ public class Enemy : MonoBehaviour
         
     }
 
-    public void SetHp(int damage)
+    public void SetHp(float damage)
     {
         currentHp -= damage;
         if (currentHp <= 0)

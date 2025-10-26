@@ -8,6 +8,8 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public GameObject gunSelectObj;
+    public Move player;
     public bool isPause = false;
     public int score = 0;
     bool isTIme = false;
@@ -40,6 +42,9 @@ public class GameManager : MonoBehaviour
         {
             AudioManager.instance.PlayBgm(false);
         }
+
+        gunSelectObj.SetActive(true);
+        Time.timeScale = 0;
         
     }
     
@@ -61,6 +66,21 @@ public class GameManager : MonoBehaviour
         }
         Destroy(continers[0]);
         Destroy(continers[1]);
+    }
+
+    public void ShotGun()
+    {
+        player.weapon = weapon_type.shotgun;
+        Time.timeScale = 1;
+        gunSelectObj.SetActive(false);
+
+    }
+
+    public void rebolber()
+    {
+        player.weapon = weapon_type.rebolber;
+        Time.timeScale = 1;
+        gunSelectObj.SetActive(false);
     }
 
 
