@@ -13,7 +13,7 @@ public enum weapon_type
 
 public class Move : MonoBehaviour
 {
-
+    public bool canShot = true;
     public GameObject rebolberBullet;
     public weapon_type weapon;
     public LayerMask groundLayer;
@@ -107,7 +107,7 @@ public class Move : MonoBehaviour
                 animator.SetBool("isMove", false);
             }
             PlayerMove();
-            if (Input.GetKeyDown(KeyCode.Mouse0) && currentBullet > 0)
+            if (Input.GetKeyDown(KeyCode.Mouse0) && currentBullet > 0 && GameManager.Instance.canShot)
             {
                 StartCoroutine(Shootgun());
             }
@@ -188,15 +188,13 @@ public class Move : MonoBehaviour
                 Debug.Log("dfadf");
                 currentHp = 0;
                 isDie = true;
-                
+                canShot = false;
                 UIManager.Instance.fullText = "Game\nOver";
                 UIManager.Instance.ShowGameOver();
                 GameManager.Instance.StageOver = true;
                 AudioManager.instance.PlaySfx(Sfx.GameOver);
                 AudioManager.instance.PlayBgm(false);
-                AudioManager.instance.sfxVolume = 0;
-                AudioManager.instance.bgmVolume = 0;
-                AudioManager.instance.VolumReset();
+                
             }
             else
             {
@@ -240,6 +238,19 @@ public class Move : MonoBehaviour
         Physics2D.IgnoreLayerCollision(7, 8, false);
         Physics2D.IgnoreLayerCollision(7, 9, false);
         isHit = false;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("hp_item"))
+        {
+            Destroy(collision.gameObject);
+            if(currentHp < MaxHp)
+            {
+                currentHp += 1;
+            }
+            HpUpdate();
+        }
     }
     public void PlayerMove()
     {
@@ -327,7 +338,7 @@ public class Move : MonoBehaviour
         else if(weapon == weapon_type.rebolber)
         {
             maxSpeedx = 11;
-            moveDirection = -jumpdir.transform.up * GunPower/5.9f;
+            moveDirection = -jumpdir.transform.up * GunPower/5f;
             
            
             //target.GetComponent<Animator>().SetTrigger("isAttack");
@@ -378,8 +389,14 @@ public class Move : MonoBehaviour
             {
                 SetHp(1);
             }
+            else if ((collision.gameObject.GetComponent<Enemy>() != null) )
+            {
+                SetHp(1);
+            }
 
         }
+
+
 
         if(collision.gameObject.name == "traps")
         {
@@ -407,6 +424,7 @@ public class Move : MonoBehaviour
 
         if (collision.gameObject.CompareTag("ChinemachineZone"))
         {
+            GameManager.Instance.canShot = false;
             UIManager.Instance.ActiveTimeLine();
         }
     }

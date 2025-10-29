@@ -10,6 +10,7 @@ TagManager:
   - trap
   - Clear
   - ChinemachineZone
+  - hp_item
   layers:
   - Default
   - TransparentFX

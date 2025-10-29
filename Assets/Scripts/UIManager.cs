@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public class UIManager : MonoBehaviour
 {
     public PlayableDirector PlayableDirector;
+    public PlayableDirector ClearTimeLine;
     public CanvasGroup PlayerUI;
     public CanvasGroup bossUi;
     bool isPause;
@@ -68,6 +69,7 @@ public class UIManager : MonoBehaviour
             GameManager.Instance.isPause = true;
             pauseUi.SetActive(true);
             Time.timeScale = 0;
+            GameManager.Instance.canShot = false;
         }
         else if(isPause && Input.GetKeyDown(KeyCode.Escape))
         {
@@ -75,6 +77,7 @@ public class UIManager : MonoBehaviour
             GameManager.Instance.isPause = false;
             pauseUi.SetActive(false);
             Time.timeScale = 1;
+            GameManager.Instance.canShot = true;
         }
     }
 
@@ -84,6 +87,7 @@ public class UIManager : MonoBehaviour
         GameManager.Instance.isPause = false;
         pauseUi.SetActive(false);
         Time.timeScale = 1;
+        GameManager.Instance.canShot = true;
     }
     public void HomeBtn()
     {
@@ -106,6 +110,7 @@ public class UIManager : MonoBehaviour
         Debug.Log(PlayableDirector.duration);
         yield return new WaitForSeconds((float)PlayableDirector.duration);
         AudioManager.instance.PlayBgm(true);
+        
         yield return new WaitForSeconds(0.1f);
         PlayerUI.alpha = 1;
         yield return new WaitForSeconds(0.1f);
@@ -114,6 +119,8 @@ public class UIManager : MonoBehaviour
         GameObject.Find("Mino").GetComponent<BossPattern>().isActive = true;
         GameObject.Find("Mino").GetComponent<BossPattern>().LoopPattern();
         GameObject.Find("TimeLine").gameObject.tag = "Untagged";
+        GameManager.Instance.canShot = true;
+        
     }
 
     public void RetryBtn()

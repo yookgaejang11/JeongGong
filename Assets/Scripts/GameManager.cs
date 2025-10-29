@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public bool canShot = false;
     public GameObject gunSelectObj;
     public Move player;
     public bool isPause = false;
@@ -73,6 +74,7 @@ public class GameManager : MonoBehaviour
         player.weapon = weapon_type.shotgun;
         Time.timeScale = 1;
         gunSelectObj.SetActive(false);
+        canShot = true;
 
     }
 
@@ -81,6 +83,7 @@ public class GameManager : MonoBehaviour
         player.weapon = weapon_type.rebolber;
         Time.timeScale = 1;
         gunSelectObj.SetActive(false);
+        canShot = true;
     }
 
 
