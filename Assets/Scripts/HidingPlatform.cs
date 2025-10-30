@@ -6,9 +6,10 @@ using UnityEngine;
 public class HidingPlatform : MonoBehaviour
 {
     public float droptime;
-
+    
     void Start()
     {
+        
     }
 
     void Update()
@@ -30,6 +31,6 @@ public class HidingPlatform : MonoBehaviour
 
     void drop()
     {
-        gameObject.AddComponent<Rigidbody2D>();
+        this.gameObject.AddComponent<Rigidbody2D>().gravityScale = 0.75f;
     }
 }

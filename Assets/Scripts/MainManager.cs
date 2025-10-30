@@ -7,6 +7,17 @@ public class MainManager : MonoBehaviour
 {
 
     public GameObject playGuide;
+    public GameObject Setting;
+
+    public void Settings()
+    {
+        Setting.SetActive(true);
+    }
+    
+    public void CloseSetting()
+    {
+        Setting.SetActive(false);
+    }
     // Start is called before the first frame update
     void Start()
     {

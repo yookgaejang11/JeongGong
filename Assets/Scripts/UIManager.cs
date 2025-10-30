@@ -35,9 +35,12 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI tmpText1;
     [TextArea]
     public string fullText = "Game\nOver";
+    public string ClearText;
+    public TextMeshProUGUI clearTextObj;
     public float typingSpeed = 0.05f;
+    public TextMeshProUGUI useCheatTxt;
 
-
+    public GameObject Settings;
     private void Awake()
     {
         if(instance == null)
@@ -103,14 +106,23 @@ public class UIManager : MonoBehaviour
         StartCoroutine(PlayTimeLine());
     }
 
+    public void SettingsOpen()
+    {
+        Settings.SetActive(true);
+    }
+
+    public void SettingsClose()
+    {
+        Settings.SetActive(false);
+    }
 
     IEnumerator PlayTimeLine()
     {
         PlayableDirector.Play();
         Debug.Log(PlayableDirector.duration);
         yield return new WaitForSeconds((float)PlayableDirector.duration);
-        AudioManager.instance.PlayBgm(true);
-        
+        AudioSetting.Instance.bgmSource.clip = AudioSetting.Instance.bgms[3];
+        AudioSetting.Instance.bgmSource.Play();
         yield return new WaitForSeconds(0.1f);
         PlayerUI.alpha = 1;
         yield return new WaitForSeconds(0.1f);
@@ -168,6 +180,48 @@ public class UIManager : MonoBehaviour
 
             });
         });
+
+    }
+
+    public void UseCheat(string txt)
+    {
+        StartCoroutine(Cheat(txt));
+    }
+
+    IEnumerator Cheat(string text)
+    {
+        useCheatTxt.text = text;
+        yield return new WaitForSeconds(1f);
+        useCheatTxt.text = "";
+    }
+
+
+
+    public void GameClear()
+    {
+        StartCoroutine(ClearGame());
+    }
+
+    IEnumerator ClearGame()
+    {
+        AudioSetting.Instance.bgmSource.Stop();
+        PlayerUI.gameObject.SetActive(false);
+        ClearTimeLine.Play();
+        yield return new WaitForSeconds(1f);
+        clearTextObj.text = "Prologue Clear!";
+        yield return new WaitForSeconds(2.5f);
+        clearTextObj.text = "¡¶¿€: ±ËπŒ√∂,¿∞¡ÿº≠\n±‚»π: ±ËπŒ√∂\nªÁøÓµÂ:±ËπŒ√∂, ¿∞¡ÿº≠";
+        yield return new WaitForSeconds(2.5f);
+        
+
+        clearTextObj.text = "";
+        for(int i = 0; i < ClearText.Length; i++)//1.7s
+        {
+            clearTextObj.text += ClearText[i];
+            yield return new WaitForSeconds(0.125f);
+        }
+        yield return new WaitForSeconds(1.5f);
+        SceneManager.LoadScene(0);
 
     }
 

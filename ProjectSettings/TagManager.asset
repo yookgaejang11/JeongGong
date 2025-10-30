@@ -11,6 +11,8 @@ TagManager:
   - Clear
   - ChinemachineZone
   - hp_item
+  - Bgm_Slider
+  - SFX_Slider
   layers:
   - Default
   - TransparentFX

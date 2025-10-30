@@ -36,6 +36,10 @@ public class enemy_Skeleton : MonoBehaviour
     {
         if (animator.GetBool("isSpawn"))
         {
+            if (GameManager.Instance.onePunch)
+            {
+                currentHp -= 9999;
+            }
             currentHp -= damage;
             animator.SetTrigger("isHit");
             StartCoroutine(Hit());
@@ -62,14 +66,25 @@ public class enemy_Skeleton : MonoBehaviour
     {
         currentHp = 0;
         animator.SetBool("isDeath", true);
-        AudioManager.instance.PlaySfx(Sfx.skeleton_die);
+        AudioSetting.Instance.PlaySFX(SFXType.skeleton_die);
         isDie = true;
-        AudioManager.instance.PlaySfx(Sfx.skeleton_die);
+        AudioSetting.Instance.PlaySFX(SFXType.skeleton_die);
         GameManager.Instance.score += 200;
         yield return new WaitForSeconds(0.5f);
         Destroy(this.gameObject);
     }
 
+    IEnumerator WalkSound()
+    {
+        while (true)
+        {
+            if (animator.GetBool("isWalk"))
+            {
+                yield return new WaitForSeconds(0.2f);
+                AudioSetting.Instance.PlaySFX(SFXType.SkeletonWalk);
+            }
+        }
+    }
 
     // Update is called once per frame
     void Update()
@@ -88,11 +103,11 @@ public class enemy_Skeleton : MonoBehaviour
                 awakeCount += 1;
                 if(awakeCount ==1)
                 {
-                    AudioManager.instance.PlaySfx(Sfx.skeletonAwake);
+                    AudioSetting.Instance.PlaySFX(SFXType.skeletonAwake);
                 }
                 animator.SetBool("isSpawn", true);
                 animator.SetBool("isWalk", true);
-                AudioManager.instance.PlaySfx(Sfx.SkeletonWalk);
+                
             }
             else if(!isFInd)
             {
@@ -182,7 +197,7 @@ public class enemy_Skeleton : MonoBehaviour
             {
                 this.transform.GetChild(0).gameObject.SetActive(false);
             }
-            AudioManager.instance.PlaySfx(Sfx.punch);
+            AudioSetting.Instance.PlaySFX(SFXType.punch);
             isShoot = true;
         }
     }

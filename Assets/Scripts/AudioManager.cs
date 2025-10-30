@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public enum Sfx { Hit1,Hit2, GameOver = 2, Playershot,EnemyShot,skeletonAwake,skeleton_die,punch,SkeletonWalk,Slash,Sting,hit_mino,Stomp}
+public enum Sfx { Hit1,Hit2, GameOver = 2, Playershot,EnemyShot,skeletonAwake,skeleton_die,punch,SkeletonWalk,Slash,Sting,hit_mino,Stomp, GameClear, revolver}
 
 public class AudioManager : MonoBehaviour
 {
@@ -93,7 +93,7 @@ public class AudioManager : MonoBehaviour
         bgmPlayer.volume = bgmVolume;
     }
 
-    public void PlaySfx(Sfx sfx)
+    public void PlaySfxs(Sfx sfx)
     {
         for(int i = 0; i  < sfxPlayers.Length;i++)
         {

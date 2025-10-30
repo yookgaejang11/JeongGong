@@ -7,12 +7,14 @@ using UnityEngine;
 
 public enum weapon_type
 {
+    None,
     shotgun,
     rebolber
 }
 
 public class Move : MonoBehaviour
 {
+    public bool isMuzuk = false;
     public bool canShot = true;
     public GameObject rebolberBullet;
     public weapon_type weapon;
@@ -82,7 +84,17 @@ public class Move : MonoBehaviour
         if (!isDie)
         {
             currentspeed = rigid.velocity.magnitude;
-           
+
+            if (Input.GetKeyDown(KeyCode.F1) && !isMuzuk)
+            {
+                isMuzuk = true;
+                UIManager.Instance.UseCheat("무적치트 활성화");
+            }
+            else if (Input.GetKeyDown(KeyCode.F1))
+            {
+                isMuzuk = false;
+                UIManager.Instance.UseCheat("무적치트 비활성화");
+            }
 
             if (Input.GetButtonUp("Horizontal") && isGround)
             {
@@ -178,27 +190,31 @@ public class Move : MonoBehaviour
 
     public void SetHp(float damage)
     {
-        if (!isHit)
+        if (!isHit && !isMuzuk)
         {
             currentHp -= (int)damage;
             StartCoroutine(Invisible());
             
             if (currentHp <= 0 && !isDie)
             {
+
                 Debug.Log("dfadf");
+
                 currentHp = 0;
+                this.gameObject.tag = "Untagged";
                 isDie = true;
+                isMuzuk = true;
                 canShot = false;
                 UIManager.Instance.fullText = "Game\nOver";
                 UIManager.Instance.ShowGameOver();
                 GameManager.Instance.StageOver = true;
-                AudioManager.instance.PlaySfx(Sfx.GameOver);
-                AudioManager.instance.PlayBgm(false);
+                AudioSetting.Instance.PlaySFX(SFXType.GameOver);
+                AudioSetting.Instance.bgmSource.Pause();
                 
             }
             else
             {
-                AudioManager.instance.PlaySfx(Sfx.Hit1);
+                AudioSetting.Instance.PlaySFX(SFXType.Hit1);
             }
             HpUpdate();
         }
@@ -325,7 +341,7 @@ public class Move : MonoBehaviour
                 currentBullet -= 1;
 
             }
-            AudioManager.instance.PlaySfx(AudioManager.instance.sfx = Sfx.Playershot);
+            AudioSetting.Instance.PlaySFX(SFXType.Playershot);
             yield return new WaitForSeconds(0.05f);
             for (float i = maxSpeedx; i > 10; i--)
             {
@@ -351,7 +367,7 @@ public class Move : MonoBehaviour
 
             }
             GameObject shootObj = Instantiate(rebolberBullet, anchor1.transform.position, rebolber1.transform.rotation);
-            AudioManager.instance.PlaySfx(AudioManager.instance.sfx = Sfx.Playershot);
+            AudioSetting.Instance.PlaySFX(SFXType.revolver);
 
             yield return new WaitForSeconds(0.1f);
 
@@ -359,10 +375,10 @@ public class Move : MonoBehaviour
             Debug.Log("dd");
             rigid.velocity = new Vector2(rigid.velocity.x, rigid.velocity.y) + moveDirection;
             GameObject shootObj1 = Instantiate(rebolberBullet, anchor2.transform.position, rebolber2.transform.rotation);
-            AudioManager.instance.PlaySfx(AudioManager.instance.sfx = Sfx.Playershot);
+            AudioSetting.Instance.PlaySFX(SFXType.revolver);
 
-            
-            
+
+
             yield return new WaitForSeconds(0.05f);
             for (float i = maxSpeedx; i > 10; i--)
             {
@@ -383,13 +399,13 @@ public class Move : MonoBehaviour
     private void OnCollisionStay2D(Collision2D collision)
     {
 
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy") && !isMuzuk)
         {
             if((collision.gameObject.GetComponent<BossPattern>() != null && !collision.gameObject.GetComponent<BossPattern>().isDie) || (collision.gameObject.GetComponent<enemy_Skeleton>() != null && !collision.gameObject.GetComponent<enemy_Skeleton>().isDie))
             {
                 SetHp(1);
             }
-            else if ((collision.gameObject.GetComponent<Enemy>() != null) )
+            else if ((collision.gameObject.GetComponent<Enemy>() != null) && !isMuzuk)
             {
                 SetHp(1);
             }
@@ -398,7 +414,7 @@ public class Move : MonoBehaviour
 
 
 
-        if(collision.gameObject.name == "traps")
+        if(collision.gameObject.name == "traps" && !isMuzuk)
         {
             SetHp(3);
         }
@@ -411,14 +427,13 @@ public class Move : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Clear"))
         {
+            isDie = true;
+
             UIManager.Instance.fullText = "Game\nClear";
             UIManager.Instance.ShowGameClear();
             GameManager.Instance.StageClear = true;
-            AudioManager.instance.PlaySfx(Sfx.GameOver);
-            AudioManager.instance.PlayBgm(false);
-            AudioManager.instance.sfxVolume = 0;
-            AudioManager.instance.bgmVolume = 0;
-            AudioManager.instance.VolumReset();
+            AudioSetting.Instance.PlaySFX(SFXType.StageClear);
+            AudioSetting.Instance.bgmSource.Stop();
         }
 
 

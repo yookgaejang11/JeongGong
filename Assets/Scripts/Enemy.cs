@@ -31,6 +31,10 @@ public class Enemy : MonoBehaviour
     public void SetHp(float damage)
     {
         currentHp -= damage;
+        if (GameManager.Instance.onePunch)
+        {
+            currentHp -= 999;
+        }
         if (currentHp <= 0)
         {
             currentHp = 0;
@@ -106,7 +110,7 @@ public class Enemy : MonoBehaviour
             pos = GameObject.Find("Player").transform.position - transform.position;
             GameObject ammo = bullet;
             GameObject.Instantiate(ammo, transform.GetChild(0).transform.position, Quaternion.identity);
-            AudioManager.instance.PlaySfx(Sfx.EnemyShot);
+            AudioSetting.Instance.PlaySFX(SFXType.EnemyShot);
             yield return new WaitForSeconds(1.5f);
             isShoot = true;
         }

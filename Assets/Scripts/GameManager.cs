@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public bool onePunch = false;
     public bool canShot = false;
     public GameObject gunSelectObj;
     public Move player;
@@ -21,6 +22,8 @@ public class GameManager : MonoBehaviour
     public float overTime;                                  //오버타임
     public GameObject[] continers;
 
+
+  
     private void Awake()
     {
         if(instance == null)
@@ -35,14 +38,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if(SceneManager.GetActiveScene().buildIndex != 3)
-        {
-            AudioManager.instance.PlayBgm(true);
-        }
-        else
-        {
-            AudioManager.instance.PlayBgm(false);
-        }
+        
 
         gunSelectObj.SetActive(true);
         Time.timeScale = 0;
@@ -54,7 +50,7 @@ public class GameManager : MonoBehaviour
         StartCoroutine(Removecontainer());
     }
 
-
+    
     IEnumerator Removecontainer()
     {
         float timer = 0;
@@ -92,7 +88,32 @@ public class GameManager : MonoBehaviour
     {
         StartCoroutine(Timer());
 
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            if(SceneManager.GetActiveScene().buildIndex == 3)
+            {
+                SceneManager.LoadScene(0);
 
+            }
+            else
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            if (onePunch)
+            {
+                onePunch = false;
+                UIManager.Instance.UseCheat("데미지 증폭 치트 비활성화");
+            }
+            else
+            {
+                onePunch = true;
+                UIManager.Instance.UseCheat("데미지 증폭 치트 활성화");
+            }
+        }
     }
 
     IEnumerator Timer()

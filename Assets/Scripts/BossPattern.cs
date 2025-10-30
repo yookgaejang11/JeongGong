@@ -26,7 +26,7 @@ public class BossPattern : MonoBehaviour
     public float attackRange;
     public float rushMinDistance;
     public float moveSpeed;
-
+    public float longSpinTimer;
     public float maxHp = 100;
     public float currentHp = 100;
     private bool isAttacking = false;
@@ -51,6 +51,9 @@ public class BossPattern : MonoBehaviour
 
     private void Update()
     {
+
+
+        longSpinTimer += Time.deltaTime;
         if(isActive)
         {
             if(isDie)
@@ -141,7 +144,7 @@ public class BossPattern : MonoBehaviour
     IEnumerator Sting()
     {
         animator.SetTrigger("sting");
-        AudioManager.instance.PlaySfx(Sfx.Sting);
+        AudioSetting.Instance.PlaySFX(SFXType.Sting);
         yield return new WaitForSeconds(0.3f);
         stingHitBox.SetActive(true);
         yield return new WaitForSeconds(0.2f);
@@ -152,7 +155,7 @@ public class BossPattern : MonoBehaviour
     IEnumerator Slash()
     {
         animator.SetTrigger("slash");
-        AudioManager.instance.PlaySfx(Sfx.Slash);
+        AudioSetting.Instance.PlaySFX(SFXType.Slash);
         yield return new WaitForSeconds(0.4f);
         slashHitBox.SetActive(true);
         yield return new WaitForSeconds(0.25f);
@@ -164,7 +167,7 @@ public class BossPattern : MonoBehaviour
     {
         animator.SetTrigger("kung");
         yield return new WaitForSeconds(0.5f);
-        AudioManager.instance.PlaySfx(Sfx.Stomp);
+        AudioSetting.Instance.PlaySFX(SFXType.Stomp);
         kungParticle.Play();
         kungHitBox.SetActive(true);
         ShakeCamera.Instance.Shaking(5, 1, 0.5f);
@@ -178,8 +181,8 @@ public class BossPattern : MonoBehaviour
         
         animator.SetTrigger("spin");
         spinHitBox.SetActive(true);
-        AudioManager.instance.PlaySfx(Sfx.Slash);
-        AudioManager.instance.PlaySfx(Sfx.Slash);
+        AudioSetting.Instance.PlaySFX(SFXType.Slash);
+        AudioSetting.Instance.PlaySFX(SFXType.Slash);
         yield return new WaitForSeconds(1f);
         spinHitBox.SetActive(false);
         yield return new WaitForSeconds(patternWaitTime);
@@ -187,18 +190,19 @@ public class BossPattern : MonoBehaviour
     IEnumerator LongSpin()
     {
         float duration = 1.5f;
-        float timer = 0f;
+        longSpinTimer = 0f;
         animator.SetBool("long", true);
         spinHitBox.SetActive(true);
 
-        while (timer < duration)
+        while (longSpinTimer < duration)
         {
             // 플레이어를 지속적으로 따라감
             
             Vector2 dir = (playerTransform.position - transform.position).normalized;
             rb.velocity = new Vector2(dir.x * moveSpeed, rb.velocity.y);
-            AudioManager.instance.PlaySfx(Sfx.Slash);
-            timer += Time.deltaTime;
+            AudioSetting.Instance.PlaySFX(SFXType.Slash);
+            yield return new WaitForSeconds(0.1f);
+            
             yield return null;
         }
         
@@ -214,6 +218,10 @@ public class BossPattern : MonoBehaviour
         if(!isDie)
         { 
             currentHp -= damage;
+            if (GameManager.Instance.onePunch)
+            {
+                currentHp -= 9999;
+            }
             slider.value = currentHp;
             StartCoroutine(Hit());
             if(currentHp <= 0)
@@ -225,14 +233,21 @@ public class BossPattern : MonoBehaviour
                 this.gameObject.GetComponent<BoxCollider2D>().size = new Vector2(0,0);
                 rb.bodyType = RigidbodyType2D.Static;
                 DisableAllHitBoxes();
+                StartCoroutine(ClearScene());
             }
 
         }
     }
 
+    IEnumerator ClearScene()
+    {
+        yield return new WaitForSeconds(2);
+        UIManager.Instance.GameClear();
+    }
+
     IEnumerator Hit()
     {
-        AudioManager.instance.PlaySfx(Sfx.hit_mino);
+        AudioSetting.Instance.PlaySFX(SFXType.hit_mino);
         this.gameObject.GetComponent<SpriteRenderer>().color = new Color(1,0,0,0.75f);
         yield return new WaitForSeconds(0.1f);
         this.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 0, 0, 1f);
