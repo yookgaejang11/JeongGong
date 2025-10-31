@@ -70,8 +70,8 @@ public class enemy_Skeleton : MonoBehaviour
         isDie = true;
         AudioSetting.Instance.PlaySFX(SFXType.skeleton_die);
         GameManager.Instance.score += 200;
-        yield return new WaitForSeconds(0.5f);
         Destroy(this.gameObject);
+        yield return null;
     }
 
     IEnumerator WalkSound()

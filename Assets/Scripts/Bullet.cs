@@ -101,12 +101,12 @@ public class Bullet : MonoBehaviour
                     collision.gameObject.gameObject.GetComponent<BossPattern>().SetHp(damage);
                 }
 
-
+                Destroy(this.gameObject);
             }
 
             
            
-            Destroy(this.gameObject);
+            
         }
 
         if (collision.gameObject.CompareTag("Ground"))

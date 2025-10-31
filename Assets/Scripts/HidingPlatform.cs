@@ -31,6 +31,6 @@ public class HidingPlatform : MonoBehaviour
 
     void drop()
     {
-        this.gameObject.AddComponent<Rigidbody2D>().gravityScale = 0.75f;
+        this.gameObject.AddComponent<Rigidbody2D>();
     }
 }

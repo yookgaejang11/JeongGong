@@ -174,7 +174,7 @@ public class Move : MonoBehaviour
         Gizmos.DrawWireCube(groundCheck.position, groundCheckSize);
     }
 
-    private void HpUpdate()
+    public void HpUpdate()
     {
         
         for (int i = 0; i < MaxHp; i++)
@@ -258,15 +258,7 @@ public class Move : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("hp_item"))
-        {
-            Destroy(collision.gameObject);
-            if(currentHp < MaxHp)
-            {
-                currentHp += 1;
-            }
-            HpUpdate();
-        }
+        
     }
     public void PlayerMove()
     {

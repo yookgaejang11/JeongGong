@@ -65,7 +65,7 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        scoreTxt.text = "SCORE\n" + GameManager.Instance.score.ToString();
+        
         if(!isPause && Input.GetKeyDown(KeyCode.Escape))
         {
             isPause = true;
